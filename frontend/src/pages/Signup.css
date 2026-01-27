@@ -1,0 +1,115 @@
+.signup-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+.signup-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.signup-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.signup-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-lightest);
+}
+
+.signup-header p {
+    color: var(--color-light);
+    font-size: 0.95rem;
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--color-lightest);
+    font-size: 0.9rem;
+}
+
+.form-group input.error {
+    border-color: var(--color-error);
+}
+
+.field-error {
+    color: var(--color-error);
+    font-size: 0.85rem;
+    margin-top: -4px;
+}
+
+.error-message {
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid var(--color-error);
+    color: var(--color-error);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.signup-button {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.signup-footer {
+    margin-top: var(--spacing-xl);
+    text-align: center;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-light);
+}
+
+.signup-footer p {
+    color: var(--color-light);
+    font-size: 0.9rem;
+}
+
+.login-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-fast);
+}
+
+.login-link:hover {
+    color: var(--color-lightest);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .signup-card {
+        padding: var(--spacing-xl);
+    }
+
+    .signup-header h1 {
+        font-size: 1.75rem;
+    }
+}

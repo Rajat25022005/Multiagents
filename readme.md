@@ -1,6 +1,33 @@
 # Multi-Agent Orchestration System
 
-This project is a sophisticated **FastAPI-based** multi-agent system designed to execute complex tasks by leveraging the power of local Large Language Models (LLMs) via Ollama. It intelligently breaks down tasks, assigns them to specialized AI agents, and generates the necessary files and reports.
+This project is a sophisticated **FastAPI-based** multi-agent system with a **modern React frontend** designed to execute complex tasks by leveraging the power of local Large Language Models (LLMs) via Ollama. It intelligently breaks down tasks, assigns them to specialized AI agents, and generates the necessary files and reports.
+
+## 🎨 New: React Frontend
+
+The system now features a **premium, modern React UI** for easy task management!
+
+- 🚀 **Task Executor**: Intuitive interface for submitting and tracking tasks
+- 📜 **History**: View and manage previously executed tasks
+- 💚 **System Health**: Real-time monitoring of backend status
+- 🌙 **Dark Theme**: Beautiful glassmorphism design with smooth animations
+
+### Quick Start
+
+1. **Start the Backend:**
+   ```bash
+   ./run.sh
+   ```
+   API runs on `http://localhost:8000`
+
+2. **Start the Frontend:**
+   ```bash
+   cd frontend
+   npm install  # First time only
+   npm run dev
+   ```
+   UI runs on `http://localhost:5173`
+
+3. **Open your browser** to `http://localhost:5173` and start orchestrating! 🎉
 
 ## Key Features
 
@@ -12,6 +39,7 @@ This project is a sophisticated **FastAPI-based** multi-agent system designed to
 - **Security Validation:** Commands are validated against security levels before execution to prevent unsafe operations.
 - **Local Privacy:** Built on top of [Ollama](https://ollama.ai/), ensuring all model inference happens locally.
 - **REST API:** Fully functional FastAPI backend for easy integration.
+- **Modern UI:** Premium React frontend with real-time updates and task history.
 
 ## System Architecture
 
@@ -26,6 +54,15 @@ The system is built on a modular architecture:
 - **`ResultProcessor`**: Parses agent output and handles file creation (including recursive directories).
 - **`FinalizerAgent`**: Reviews the work and generates a final report.
 - **`FileManager`**: Handles workspace file operations.
+
+## Frontend Technology Stack
+
+- **React 18** with modern hooks
+- **Vite** for lightning-fast development
+- **React Router** for navigation
+- **Axios** for API calls
+- **Custom CSS** with premium design tokens
+- **Responsive Design** for all devices
 
 ## Capabilities
 
@@ -55,6 +92,7 @@ The system includes a dedicated `VisionAgent` that can:
 
 - **Mac/Linux** (Recommended)
 - **Python 3.10+**
+- **Node.js 18+** (for frontend)
 - **Ollama** installed and running
 
 ### Installation
@@ -77,14 +115,41 @@ The project includes an automated setup script to install dependencies and pull 
     - Pull the default models (e.g., `deepseek-v3.1`).
     - Create the necessary workspace directories.
 
+3.  Install Frontend Dependencies:
+    ```bash
+    cd frontend
+    npm install
+    ```
+
 ### Usage
 
-1.  **Start the Server:**
-    Use the provided run script to start the FastAPI server with hot-reload enabled.
+#### Option 1: Use the Web UI (Recommended)
+
+1.  **Start the Backend:**
     ```bash
     ./run.sh
     ```
     The server will start at `http://127.0.0.1:8000`.
+
+2.  **Start the Frontend:**
+    ```bash
+    cd frontend
+    npm run dev
+    ```
+    The UI will start at `http://localhost:5173`.
+
+3.  **Access the Application:**
+    Open `http://localhost:5173` in your browser and use the intuitive interface to:
+    - Submit tasks
+    - View task history
+    - Monitor system health
+
+#### Option 2: Use the API Directly
+
+1.  **Start the Server:**
+    ```bash
+    ./run.sh
+    ```
 
 2.  **Access the API:**
     - **Swagger UI:** Navigate to `http://127.0.0.1:8000/docs` to interact with the API visually.
@@ -119,7 +184,42 @@ You can run the entire system in a Docker container.
 
 ## Development
 
-- **`app/`**: Contains the FastAPI application and routes.
-- **`core/`**: Contains the core logic (`OrchestratorEngine`).
-- **`action/`**: Contains execution tools including `EnvironmentManager`.
-- **`workspace/`**: The default location where generated files are saved.
+- **`backend/`**: Contains all backend code organized into modules
+  - **`api/`**: FastAPI application, routes, and schemas
+  - **`core/`**: Core logic (OrchestratorEngine, LLM Router)
+  - **`agents/`**: AI agents (Planner, Vision, GraphMemory)
+  - **`actions/`**: Execution tools (FileManager, EnvironmentManager, Finalizer)
+  - **`admin/`**: Admin utilities (Spawner, Security, Manager)
+  - **`processing/`**: Result processing
+  - **`config/`**: Configuration settings
+- **`frontend/`**: Contains the React application
+- **`workspace/`**: The default location where generated files are saved
+- **`tests/`**: Test files
+
+## Frontend Features
+
+### Task Executor
+- Submit tasks with optional JSON context
+- Real-time loading indicators
+- Result display with syntax highlighting
+- Error handling with user-friendly messages
+
+### Task History
+- View all previously executed tasks
+- Detailed task inspection
+- Delete individual or all tasks
+- Persistent localStorage storage
+
+### System Health
+- Real-time backend monitoring
+- API endpoint status checks
+- Auto-refresh every 30 seconds
+- System statistics display
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

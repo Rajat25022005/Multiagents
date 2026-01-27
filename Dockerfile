@@ -28,4 +28,4 @@ RUN chmod +x run.sh setup.sh
 EXPOSE 8000
 
 # Run the application directly to avoid script execution issues
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

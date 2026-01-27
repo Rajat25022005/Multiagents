@@ -10,3 +10,7 @@ groq
 google-generativeai
 openai
 neo4j
+python-multipart
+sqlalchemy
+passlib[bcrypt]
+python-jose[cryptography]
