@@ -1,225 +1,259 @@
-# Multi-Agent Orchestration System
+# 🤖 AgentOS — Multi-Agent Orchestration System
 
-This project is a sophisticated **FastAPI-based** multi-agent system with a **modern React frontend** designed to execute complex tasks by leveraging the power of local Large Language Models (LLMs) via Ollama. It intelligently breaks down tasks, assigns them to specialized AI agents, and generates the necessary files and reports.
+A production-ready, full-stack AI agent system featuring parallel task execution, vector memory, ReAct tool agents, real-time SSE streaming, and a modern React UI.
 
-## 🎨 New: React Frontend
+---
 
-The system now features a **premium, modern React UI** for easy task management!
+## 🏗 Architecture
 
-- 🚀 **Task Executor**: Intuitive interface for submitting and tracking tasks
-- 📜 **History**: View and manage previously executed tasks
-- 💚 **System Health**: Real-time monitoring of backend status
-- 🌙 **Dark Theme**: Beautiful glassmorphism design with smooth animations
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        React Frontend                        │
+│              SSE streaming · Task history · Dark UI          │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTP / SSE
+┌──────────────────────────▼──────────────────────────────────┐
+│                     FastAPI Backend                          │
+│   Auth (JWT) · Task Routes · System Routes · Health Check   │
+└──┬──────────────┬────────────────┬───────────────────────────┘
+   │              │                │
+   ▼              ▼                ▼
+Celery+Redis  Orchestrator   PostgreSQL
+(async jobs)   Engine        (task history)
+                  │
+        ┌─────────┼──────────┐
+        ▼         ▼          ▼
+    Planner   Executor    ReAct
+    Agent     Agent       Agent
+     │            │          │
+     │         ChromaDB   Tools:
+     │        (vector      search_web
+     │         memory)     run_python
+     └──────────────────   read_file
+              │            write_file
+           Neo4j
+        (graph memory)
+```
 
-### Quick Start
+---
 
-1. **Start the Backend:**
-   ```bash
-   ./run.sh
-   ```
-   API runs on `http://localhost:8000`
-
-2. **Start the Frontend:**
-   ```bash
-   cd frontend
-   npm install  # First time only
-   npm run dev
-   ```
-   UI runs on `http://localhost:5173`
-
-3. **Open your browser** to `http://localhost:5173` and start orchestrating! 🎉
-
-## Key Features
-
-- **Full Stack Project Generation:** Capable of generating complex directory structures (e.g., MERN stack with `client/` and `server/`) using a robust file protocol.
-- **Vision-to-Code:** Can analyze UI screenshots and generate matching code (React, HTML/CSS).
-- **Self-Healing Dependency Management:** Automatically runs `npm install` or `pip install`. If installation fails, the system **self-corrects** by asking the AI to fix the configuration files (e.g., `package.json`) and retries.
-- **Intelligent Task Decomposition:** The system takes a high-level task and breaks it down into actionable subtasks.
-- **Dynamic Agent Spawning:** Automatically spawns specialized agents (Planner, Executor, Finalizer) based on the task needs.
-- **Security Validation:** Commands are validated against security levels before execution to prevent unsafe operations.
-- **Local Privacy:** Built on top of [Ollama](https://ollama.ai/), ensuring all model inference happens locally.
-- **REST API:** Fully functional FastAPI backend for easy integration.
-- **Modern UI:** Premium React frontend with real-time updates and task history.
-
-## System Architecture
-
-The system is built on a modular architecture:
-
-- **`OrchestratorEngine`**: The core brain (no UI/API) that coordinates the entire lifecycle.
-- **`EnvironmentManager`**: Handles automated dependency installation and environment setup.
-- **`AgentSpawner`**: Dynamically configures and spawns the appropriate LLM contexts.
-- **`PlannerAgent`**: Breaks down the initial prompt into a structured plan.
-- **`ExecutorAgent`**: Executes individual subtasks using the selected LLM with support for deep file structures.
-- **`SecurityValidator`**: Enforces security policies (e.g., blocking dangerous shell commands).
-- **`ResultProcessor`**: Parses agent output and handles file creation (including recursive directories).
-- **`FinalizerAgent`**: Reviews the work and generates a final report.
-- **`FileManager`**: Handles workspace file operations.
-
-## Frontend Technology Stack
-
-- **React 18** with modern hooks
-- **Vite** for lightning-fast development
-- **React Router** for navigation
-- **Axios** for API calls
-- **Custom CSS** with premium design tokens
-- **Responsive Design** for all devices
-
-## Capabilities
-
-### Complex Project Structures
-Unlike simple code generators, this system supports creating deep directory trees.
-- **Example**: "Create a MERN stack app"
-- **Result**:
-  - `workspace/server/package.json`
-  - `workspace/server/routes/auth.js`
-  - `workspace/client/src/App.js`
-
-### Auto-Install & Repair
-The system attempts to make the generated code **runnable out of the box**.
-1.  It detects `package.json` or `requirements.txt`.
-2.  Run the install command (`npm install`, etc).
-3.  **Self-Correction**: If the install fails (e.g. invalid version), it feeds the error back to the AI, patches the file, and retries automatically.
-
-### Vision Agent 👁️➡️💻
-The system includes a dedicated `VisionAgent` that can:
-- **Analyze UI Designs:** Breaks down screenshots into structural components (Header, Sidebar, Grid).
-- **Generate Code:** Converts visual inputs directly into frontend code (e.g., "Build this dashboard").
-- **Multi-Provider Support:** Works with LLaVA (Ollama), GPT-4o, and Gemini Pro Vision.
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
+- Docker + Docker Compose
+- At least one LLM provider API key (OpenAI, Groq, Gemini) OR local Ollama
 
-- **Mac/Linux** (Recommended)
-- **Python 3.10+**
-- **Node.js 18+** (for frontend)
-- **Ollama** installed and running
+### 1. Clone and configure
 
-### Installation
+```bash
+git clone <your-repo>
+cd multiagent
+cp .env.example .env
+```
 
-The project includes an automated setup script to install dependencies and pull the required Ollama models.
+Edit `.env` — at minimum set your LLM provider key:
+```env
+LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+DEFAULT_MODEL=gpt-4o-mini
+```
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/your-username/multi-agent-system.git
-    cd multi-agent-system
-    ```
+### 2. Deploy with Docker Compose
 
-2.  Run the setup script:
-    ```bash
-    ./setup.sh
-    ```
-    This will:
-    - Check for Python and Ollama.
-    - Install Python dependencies from `requirements.txt`.
-    - Pull the default models (e.g., `deepseek-v3.1`).
-    - Create the necessary workspace directories.
+```bash
+docker-compose up -d
+```
 
-3.  Install Frontend Dependencies:
-    ```bash
-    cd frontend
-    npm install
-    ```
+Services start:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+- **Neo4j Browser**: http://localhost:7474
 
-### Usage
+### 3. First run
 
-#### Option 1: Use the Web UI (Recommended)
+1. Open http://localhost:3000
+2. Click "Create account"
+3. Enter any task and click "Run Task"
 
-1.  **Start the Backend:**
-    ```bash
-    ./run.sh
-    ```
-    The server will start at `http://127.0.0.1:8000`.
+---
 
-2.  **Start the Frontend:**
-    ```bash
-    cd frontend
-    npm run dev
-    ```
-    The UI will start at `http://localhost:5173`.
+## 🔧 Local Development
 
-3.  **Access the Application:**
-    Open `http://localhost:5173` in your browser and use the intuitive interface to:
-    - Submit tasks
-    - View task history
-    - Monitor system health
+### Backend
 
-#### Option 2: Use the API Directly
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
-1.  **Start the Server:**
-    ```bash
-    ./run.sh
-    ```
+# Start services
+docker-compose up postgres redis neo4j -d
 
-2.  **Access the API:**
-    - **Swagger UI:** Navigate to `http://127.0.0.1:8000/docs` to interact with the API visually.
-    - **ReDoc:** Navigate to `http://127.0.0.1:8000/redoc`.
+# Run backend
+uvicorn main:app --reload --port 8000
+```
 
-3.  **Execute a Task:**
-    Send a POST request to `/tasks/execute`:
+### Celery Worker (separate terminal)
 
-    ```bash
-    curl -X POST "http://127.0.0.1:8000/tasks/execute" \
-         -H "Content-Type: application/json" \
-         -d '{
-               "task": "Create a MERN stack application for a car dealership",
-               "context": {}
-             }'
-    ```
+```bash
+cd backend
+celery -A workers.celery_app worker --loglevel=info
+```
 
-## Docker Support 🐳
+### Frontend
 
-You can run the entire system in a Docker container.
+```bash
+cd frontend
+npm install
+npm run dev
+# Opens at http://localhost:5173
+```
 
-1.  **Build and Run:**
-    ```bash
-    docker-compose up --build
-    ```
+---
 
-2.  **Access:**
-    The API will be available at `http://localhost:8000`.
+## 🤖 Agent Types
 
-3.  **Note on Ollama:**
-    The container is configured to talk to your *host machine's* Ollama instance via `host.docker.internal`. Ensure Ollama is running on your machine (`ollama serve`).
+| Agent | Description | Use Case |
+|-------|-------------|----------|
+| `executor` | General reasoning & writing | Default agent |
+| `react` | ReAct loop with tool use | Tasks needing web search, code execution, file ops |
+| `code` | Generate + run Python code | Data analysis, automation scripts |
+| `search` | Web research + summarization | Research tasks |
+| `summarizer` | Synthesize multiple results | Aggregation |
 
-## Development
+The **Planner Agent** automatically selects the right agent type per subtask.
 
-- **`backend/`**: Contains all backend code organized into modules
-  - **`api/`**: FastAPI application, routes, and schemas
-  - **`core/`**: Core logic (OrchestratorEngine, LLM Router)
-  - **`agents/`**: AI agents (Planner, Vision, GraphMemory)
-  - **`actions/`**: Execution tools (FileManager, EnvironmentManager, Finalizer)
-  - **`admin/`**: Admin utilities (Spawner, Security, Manager)
-  - **`processing/`**: Result processing
-  - **`config/`**: Configuration settings
-- **`frontend/`**: Contains the React application
-- **`workspace/`**: The default location where generated files are saved
-- **`tests/`**: Test files
+---
 
-## Frontend Features
+## 🛠 ReAct Tools
 
-### Task Executor
-- Submit tasks with optional JSON context
-- Real-time loading indicators
-- Result display with syntax highlighting
-- Error handling with user-friendly messages
+Available to the `react` agent:
 
-### Task History
-- View all previously executed tasks
-- Detailed task inspection
-- Delete individual or all tasks
-- Persistent localStorage storage
+| Tool | Description |
+|------|-------------|
+| `search_web(query)` | DuckDuckGo search |
+| `read_file(path)` | Read file from disk |
+| `write_file(path, content)` | Write file to disk |
+| `run_python(code)` | Execute Python in sandbox |
+| `list_files(directory)` | List directory contents |
+| `http_get(url)` | Fetch any URL |
 
-### System Health
-- Real-time backend monitoring
-- API endpoint status checks
-- Auto-refresh every 30 seconds
-- System statistics display
+---
 
-## Contributing
+## 📡 API Reference
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Auth
+```
+POST /auth/register   { email, username, password }
+POST /auth/login      { email, password }
+GET  /auth/me
+```
 
-## License
+### Tasks
+```
+POST /tasks/execute          Queue async task → { job_id }
+POST /tasks/execute/stream   Stream task via SSE
+GET  /tasks/status/{job_id}  Poll Celery job status
+GET  /tasks/                 List user's tasks
+GET  /tasks/{id}             Get task details
+DELETE /tasks/{id}           Delete task
+```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### System
+```
+GET /system/health   Service health check
+GET /system/info     LLM provider info
+```
+
+---
+
+## 🔌 LLM Providers
+
+Configure in `.env`:
+
+```env
+# OpenAI
+LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+DEFAULT_MODEL=gpt-4o-mini
+
+# Groq (fast + free tier)
+LLM_PROVIDER=groq
+GROQ_API_KEY=gsk_...
+DEFAULT_MODEL=llama-3.1-70b-versatile
+
+# Google Gemini
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=...
+DEFAULT_MODEL=gemini-1.5-flash
+
+# Ollama (local)
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+DEFAULT_MODEL=llama3.2
+```
+
+---
+
+## 📊 Observability (Optional)
+
+Add Langfuse for LLM tracing:
+
+```env
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_HOST=https://cloud.langfuse.com
+```
+
+---
+
+## 🐳 Production Deployment
+
+```bash
+# Build and push images
+docker-compose build
+docker-compose push
+
+# Or use Docker Swarm
+docker stack deploy -c docker-compose.yml multiagent
+
+# Scale workers
+docker-compose up --scale worker=4 -d
+```
+
+---
+
+## 📁 Project Structure
+
+```
+multiagent/
+├── backend/
+│   ├── api/
+│   │   ├── models/        # SQLAlchemy models + Pydantic schemas
+│   │   └── routes/        # FastAPI route handlers
+│   ├── agents/
+│   │   ├── planner.py     # Task decomposition with structured output
+│   │   ├── executor.py    # General + code execution agents
+│   │   ├── react_agent.py # ReAct tool-use loop
+│   │   └── vector_memory.py # ChromaDB semantic search
+│   ├── core/
+│   │   ├── llm_router.py  # Unified LLM provider abstraction
+│   │   ├── neo4j_client.py # Graph memory
+│   │   └── security.py    # JWT auth
+│   ├── workers/           # Celery async task workers
+│   ├── actions/           # Code sandbox, web scraper, file manager
+│   ├── orchestrator/      # Main engine: parallel execution + streaming
+│   └── main.py            # FastAPI app entry point
+├── frontend/
+│   ├── src/
+│   │   ├── pages/         # Login, Register, Dashboard, TaskDetail
+│   │   ├── components/    # StreamViewer, ResultViewer, Layout
+│   │   ├── store/         # Zustand state (auth, tasks)
+│   │   └── services/      # Axios API client
+│   ├── nginx.conf         # Production nginx with API proxy
+│   └── Dockerfile         # Multi-stage build
+├── docker-compose.yml
+└── .env.example
+```

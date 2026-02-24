@@ -1,65 +1,43 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Navigation from './components/Navigation';
-import ProtectedRoute from './components/ProtectedRoute';
-import TaskExecutor from './components/TaskExecutor';
-import TaskHistory from './components/TaskHistory';
-import SystemHealth from './components/SystemHealth';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import './App.css';
+import { useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useAuthStore } from "./store/authStore";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import TaskDetailPage from "./pages/TaskDetailPage";
+import Layout from "./components/Layout";
+import "./index.css";
 
-function App() {
-    return (
-        <Router>
-            <AuthProvider>
-                <div className="app">
-                    <Navigation />
-                    <main className="main-content">
-                        <Routes>
-                            {/* Public routes */}
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/signup" element={<Signup />} />
-
-                            {/* Protected routes */}
-                            <Route
-                                path="/"
-                                element={
-                                    <ProtectedRoute>
-                                        <TaskExecutor />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/history"
-                                element={
-                                    <ProtectedRoute>
-                                        <TaskHistory />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/health"
-                                element={
-                                    <ProtectedRoute>
-                                        <SystemHealth />
-                                    </ProtectedRoute>
-                                }
-                            />
-                        </Routes>
-                    </main>
-                    <footer className="app-footer">
-                        <p>
-                            Multi-Agent Orchestration System © {new Date().getFullYear()}
-                        </p>
-                        <p className="footer-tech">
-                            Powered by FastAPI, Ollama & React
-                        </p>
-                    </footer>
-                </div>
-            </AuthProvider>
-        </Router>
-    );
+function ProtectedRoute({ children }) {
+  const token = useAuthStore((s) => s.token);
+  return token ? children : <Navigate to="/login" replace />;
 }
 
-export default App;
+export default function App() {
+  const fetchMe = useAuthStore((s) => s.fetchMe);
+
+  useEffect(() => {
+    fetchMe();
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="tasks/:id" element={<TaskDetailPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

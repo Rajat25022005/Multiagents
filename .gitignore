@@ -73,3 +73,38 @@ htmlcov/
 *.tmp
 *.bak
 *.old
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/node_modules
+
+# Data
+vector_db/
+outputs/
+*.db
+
+# Docker
+.docker/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+celerybeat-schedule
