@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
   // Extract final result from stream events
   useEffect(() => {
-    const doneEvent = streamEvents.findLast((e) => e.stage === "done");
+    const doneEvent = [...streamEvents].reverse().find((e) => e.stage === "done");
     if (doneEvent?.result) {
       setLastResult(doneEvent.result);
     }

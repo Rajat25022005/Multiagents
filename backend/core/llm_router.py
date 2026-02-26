@@ -175,8 +175,13 @@ class LLMRouter:
         model = genai.GenerativeModel(self.model)
         # Convert to Gemini format
         history, last = messages[:-1], messages[-1]
+        def _to_gemini_role(role: str) -> str:
+            return "model" if role == "assistant" else "user"
+
         chat = model.start_chat(history=[
-            {"role": m["role"], "parts": [m["content"]]} for m in history
+            {"role": _to_gemini_role(m["role"]), "parts": [m["content"]]}
+            for m in history
+            if m["role"] != "system"
         ])
         resp = chat.send_message(last["content"])
         return LLMResponse(content=resp.text, model=self.model)

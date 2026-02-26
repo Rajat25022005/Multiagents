@@ -177,3 +177,4 @@ async def delete_task(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     await db.delete(task)
+    await db.commit()

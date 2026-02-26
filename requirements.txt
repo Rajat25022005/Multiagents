@@ -1,16 +1,9 @@
+# Root-level requirements.txt is intentionally minimal.
+# The full backend requirements are in backend/requirements.txt
+# The root Dockerfile is for the legacy orchestrator only.
 fastapi
 uvicorn
-ollama
 pydantic
-beautifulsoup4
-requests
 pydantic-settings
 python-dotenv
-groq
-google-generativeai
-openai
-neo4j
-python-multipart
-sqlalchemy
-passlib[bcrypt]
-python-jose[cryptography]
+requests

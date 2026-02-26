@@ -39,6 +39,9 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("Neo4j unavailable", error=str(e))
 
+    if settings.secret_key == "dev-secret-key-change-in-prod":
+        logger.warning("⚠️  SECRET_KEY is set to the insecure default. Set SECRET_KEY in your .env before deploying to production.")
+
     yield
 
     logger.info("Shutting down")
@@ -58,7 +61,7 @@ app = FastAPI(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "*"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

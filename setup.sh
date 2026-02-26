@@ -106,9 +106,6 @@ echo ""
 
 # Create __init__.py files
 echo "→ Setting up Python modules..."
-touch admin/__init__.py
-touch cognitive/__init__.py
-touch action/__init__.py
 echo "✓ Modules configured"
 echo ""
 

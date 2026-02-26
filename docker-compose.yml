@@ -11,6 +11,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
@@ -24,6 +26,8 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -73,6 +77,12 @@ services:
     ports:
       - "8000:8000"
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/system/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   # ── Celery Worker ─────────────────────────────────────────────────────────
   worker:
@@ -89,8 +99,10 @@ services:
       - backend_outputs:/app/outputs
       - vector_db:/app/vector_db
     depends_on:
-      - backend
-      - redis
+      backend:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: celery -A workers.celery_app worker --loglevel=info --concurrency=4 -Q default,priority
 
   # ── Celery Beat (scheduled tasks) ─────────────────────────────────────────
@@ -104,7 +116,10 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-multiagent}
       REDIS_URL: redis://redis:6379/0
     depends_on:
-      - redis
+      backend:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: celery -A workers.celery_app beat --loglevel=info
 
   # ── Frontend ──────────────────────────────────────────────────────────────

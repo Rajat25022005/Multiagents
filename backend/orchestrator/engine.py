@@ -154,7 +154,9 @@ class OrchestratorEngine:
         _stage("planning")
         similar = self.memory.search_similar(task, n_results=3, user_id=user_id)
         context = "\n".join(s["content"][:200] for s in similar) if similar else ""
-        plan = self.planner.create_plan(task, context)
+        plan = await asyncio.get_event_loop().run_in_executor(
+            None, lambda: self.planner.create_plan(task, context)
+        )
 
         try:
             self.neo4j.store_task(str(task_db_id), task, user_id)
@@ -184,7 +186,9 @@ class OrchestratorEngine:
                 remaining = [t for t in remaining if t.task_id not in results]
 
         _stage("finalizing")
-        final = self.finalizer.finalize(task, results, files_created)
+        final = await asyncio.get_event_loop().run_in_executor(
+            None, lambda: self.finalizer.finalize(task, results, files_created)
+        )
 
         try:
             self.memory.store_task_result(task, final[:800], task_db_id, user_id, files_created)

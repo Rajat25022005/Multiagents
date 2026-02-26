@@ -55,16 +55,27 @@ def execute_task_celery(
 
         orchestrator = OrchestratorEngine(provider=provider, model=model)
 
-        # Run async engine in sync context
         loop = asyncio.new_event_loop()
-        result = loop.run_until_complete(
-            orchestrator.execute(
-                task=task_description,
-                user_id=user_id,
-                on_stage=lambda stage: update_status(stage),
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(
+                orchestrator.execute(
+                    task=task_description,
+                    user_id=user_id,
+                    task_db_id=task_id,
+                    on_stage=lambda stage: update_status(stage),
+                )
             )
-        )
-        loop.close()
+        finally:
+            try:
+                pending = asyncio.all_tasks(loop)
+                for task in pending:
+                    task.cancel()
+                if pending:
+                    loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+            finally:
+                loop.close()
+                asyncio.set_event_loop(None)
 
         update_status(
             "done",
